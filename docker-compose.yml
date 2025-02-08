@@ -1,0 +1,31 @@
+services:
+  mysql-server:
+    platform: linux/x86_64
+    image: mysql:8.0.27
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_DATABASE: ory
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      TZ: 'Asia/Tokyo'
+  phpmyadmin:
+    platform: linux/x86_64
+    image: phpmyadmin
+    depends_on:
+      - mysql-server
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS=mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=mysql
+    ports:
+      - "3001:80"
+  ory-kratos:
+    platform: linux/x86_64
+    image: oryd/kratos:v0.6.0
+    ports:
+      - "4434:4434"
+    environment:
+      - DSN=ory:password@tcp(mysql-server:3306)/ory?parseTime=true
